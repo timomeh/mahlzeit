@@ -6,17 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "invoke": "npm run dotenv && curl 'http://localhost:3000/cron?skipTimeCheck' -H \"x-cron-secret: $CRON_SECRET\"",
+    "dotenv": "set -a; source .env.local; set +a"
   },
   "dependencies": {
     "@types/node": "20.2.3",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
+    "cheerio": "^1.0.0-rc.12",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.3",
+    "html-to-text": "^9.0.5",
     "next": "13.4.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.4"
+  },
+  "devDependencies": {
+    "@types/html-to-text": "^9.0.0",
+    "prettier": "^2.8.8"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
   }
 }

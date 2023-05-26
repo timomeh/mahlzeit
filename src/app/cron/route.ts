@@ -43,7 +43,7 @@ async function menuWerner() {
     .replace(/\(\*.*\)/g, '')
     .trim()
 
-  const header = '*Metzgerei Werner*'
+  const header = '🐷 *Metzgerei Werner*'
   return `${header}\n\n${text}`
 }
 
@@ -72,7 +72,7 @@ async function menuStuermer() {
     .join('\n')
     .trim()
 
-  const header = '*Metzgerei Stürmer*'
+  const header = '🍖 *Metzgerei Stürmer*'
   return `${header}\n\n${text}`
 }
 

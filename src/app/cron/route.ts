@@ -1,6 +1,7 @@
 import { headers } from 'next/headers'
 import * as cheerio from 'cheerio'
 import * as htmlToText from 'html-to-text'
+import * as gcal from '@/lib/gcal'
 
 export async function GET(request: Request) {
   if (!isAllowed()) {
@@ -12,8 +13,9 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const skipTimeCheck = searchParams.has('skipTimeCheck')
 
-  if (!isLunchinTime() && !skipTimeCheck) {
-    console.log('not lunchin time yet')
+  const shouldNotifyMe = await isLunchinTime()
+  if (!shouldNotifyMe && !skipTimeCheck) {
+    console.log('not lunchin time')
     return new Response('SKIP')
   }
 
@@ -108,7 +110,7 @@ function isAllowed() {
   return headers().get('x-cron-secret') === process.env.CRON_SECRET
 }
 
-function isLunchinTime() {
+async function isLunchinTime() {
   const SEND_AT_HOUR = 11
   const SEND_AT_DAYS = [1, 2, 3, 4, 5]
 
@@ -120,5 +122,13 @@ function isLunchinTime() {
   const isLunchDay = SEND_AT_DAYS.includes(new Date().getDay())
   const isLunchTime = tzDate.getHours() === SEND_AT_HOUR
 
-  return isLunchDay && isLunchTime
+  let hasLunchBreak = true
+  try {
+    hasLunchBreak = await gcal.hasLunchBreakToday()
+  } catch (error) {
+    console.error(error)
+    await sendMessage('🫨 Ohje! Ich konnte den Kalender nicht checken.')
+  }
+
+  return isLunchDay && isLunchTime && hasLunchBreak
 }

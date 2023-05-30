@@ -7,16 +7,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "invoke": "npm run dotenv && curl 'http://localhost:3000/cron?skipTimeCheck' -H \"x-cron-secret: $CRON_SECRET\"",
-    "dotenv": "set -a; source .env.local; set +a"
+    "invoke": "set -a; source .env.local; set +a && curl 'http://localhost:3000/cron?skipTimeCheck' -H \"x-cron-secret: $CRON_SECRET\"",
+    "googleauth": "set -a; source .env.local; set +a&& zx scripts/google-auth.mjs"
   },
   "dependencies": {
+    "@google-cloud/local-auth": "^2.1.0",
     "@types/node": "20.2.3",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
+    "@vercel/kv": "^0.2.1",
     "cheerio": "^1.0.0-rc.12",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.3",
+    "googleapis": "^105.0.0",
     "html-to-text": "^9.0.5",
     "next": "13.4.3",
     "react": "18.2.0",
@@ -25,7 +28,8 @@
   },
   "devDependencies": {
     "@types/html-to-text": "^9.0.0",
-    "prettier": "^2.8.8"
+    "prettier": "^2.8.8",
+    "zx": "^7.2.2"
   },
   "prettier": {
     "semi": false,

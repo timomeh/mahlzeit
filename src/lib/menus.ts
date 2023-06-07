@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio'
 import * as htmlToText from 'html-to-text'
 
-export const allMenus = [menuWerner, menuStuermer]
+export const allMenus = [menuWerner, menuStuermer, menuHembsch]
 
 // Metzgerei Werner - https://www.wernersmetzgerei.de
 // 1 meal per day
@@ -57,6 +57,52 @@ async function menuStuermer() {
     .trim()
 
   const header = '🍖 *Metzgerei Stürmer*'
+  return `${header}\n\n${text}`
+}
+
+// Fisch Hembsch - https://fisch-hembsch-bestellen.de
+// multiple meals per ... day? week? dunno yet
+async function menuHembsch() {
+  const result = await fetchHtml(
+    'https://fisch-hembsch-bestellen.de/12697/cat/192724'
+  )
+  const $ = cheerio.load(result)
+
+  const menu = $('.products-list-container')
+  const html = menu.html()
+
+  if (!html) {
+    return null
+  }
+
+  const text = htmlToText
+    .compile({
+      selectors: [
+        { selector: 'h5', options: { uppercase: false } },
+        {
+          selector: '.product-small-picture-container',
+          format: 'inlineSurround',
+          options: { suffix: '---' },
+        },
+      ],
+    })(html)
+    .replace(/Product information/g, '')
+    .replace(/Produktinformation/g, '')
+    .replace(/^\+$/gm, '')
+    .split('---')
+    .filter(
+      (text) =>
+        text.length > 0 && !text.toLocaleLowerCase().includes('ausverkauft')
+    )
+    .map((text) =>
+      text
+        .replace(/\n\s*\n\s*\n/gm, '\n')
+        .replace(/\n\n/gm, '\n')
+        .trim()
+    )
+    .join('\n\n')
+
+  const header = '🎣 *Fisch Hembsch*'
   return `${header}\n\n${text}`
 }
 

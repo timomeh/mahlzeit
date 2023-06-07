@@ -19,8 +19,14 @@ export async function GET(request: Request) {
     return new Response('SKIP')
   }
 
-  const menus = await Promise.all(allMenus.map((menu) => menu()))
-  await sendMessage(menus.join('\n\n'))
+  const menus = await Promise.all(
+    allMenus.map((menu) =>
+      menu()
+        // silently ignore errors. i'll notice when it's missing.
+        .catch(() => null)
+    )
+  )
+  await sendMessage(menus.filter((text) => text).join('\n\n'))
 
   return new Response('OK')
 }

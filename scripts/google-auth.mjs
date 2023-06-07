@@ -1,28 +1,24 @@
 import 'zx/globals'
-import { authenticate } from '@google-cloud/local-auth'
+import { google } from 'googleapis'
 import { kv } from '@vercel/kv'
 
-const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-const CREDENTIALS_PATH = path.join(process.cwd(), 'google-credentials.json')
-
-// Opens browser window, log in, sends result back here
-const client = await authenticate({
-  scopes: SCOPES,
-  keyfilePath: CREDENTIALS_PATH,
+const scope = ['https://www.googleapis.com/auth/calendar.readonly']
+const oauth = new google.auth.OAuth2({
+  clientId: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  redirectUri: 'urn:ietf:wg:oauth:2.0:oob', // will show the code instead of doing a redirect
 })
 
-if (!client.credentials) {
-  throw new Error('no credentials returned')
-}
-
-const keys = await fs.readJson(CREDENTIALS_PATH)
-const key = keys.installed || keys.web
-const payload = JSON.stringify({
-  type: 'authorized_user',
-  client_id: key.client_id,
-  client_secret: key.client_secret,
-  refresh_token: client.credentials.refresh_token,
+const url = oauth.generateAuthUrl({
+  access_type: 'offline',
+  scope,
 })
-await kv.set(process.env.KV_GTOKEN_KEY, payload)
+
+await $`open ${url}`
+console.log('Authorize in the browser. After that, paste the code here.')
+const authCode = await question('Code: ')
+
+const { tokens } = await oauth.getToken(authCode)
+await kv.set(process.env.KV_GTOKEN_KEY, tokens.refresh_token)
 
 console.log('authed and stored 🚀')

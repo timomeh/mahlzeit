@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "invoke": "set -a; source .env.local; set +a && curl 'http://localhost:3000/cron?skipTimeCheck' -H \"x-cron-secret: $CRON_SECRET\"",
-    "googleauth": "set -a; source .env.local; set +a&& zx scripts/google-auth.mjs"
+    "invoke": "set -a; source .env.local; set +a; curl 'http://localhost:3000/cron?skipTimeCheck' -H \"x-cron-secret: $CRON_SECRET\"",
+    "googleauth": "open 'http://localhost:3000/oauth2/auth'"
   },
   "dependencies": {
     "@vercel/kv": "^0.2.1",
@@ -27,8 +27,7 @@
     "@types/node": "20.2.3",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
-    "prettier": "^2.8.8",
-    "zx": "^7.2.2"
+    "prettier": "^2.8.8"
   },
   "prettier": {
     "semi": false,

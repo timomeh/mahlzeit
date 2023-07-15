@@ -20,12 +20,12 @@ Copy `.env` to `.env.local` and fill in vars.
 
 ```bash
 npm i
-npm run googleauth # auth to google
 npm run dev # run server
+npm run googleauth # auth to google
 npm run invoke # invoke cron
 ```
 
 ### Auth to Google
 
-Run `npm run googleauth` locally. Follow the instructions. It stores a
-refresh_token which is used by the server.
+Start the server locally, then run `npm run googleauth`. Click through the
+oauth flow.

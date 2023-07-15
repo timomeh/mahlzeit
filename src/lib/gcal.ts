@@ -1,5 +1,5 @@
 import { google } from 'googleapis'
-import { kv } from '@vercel/kv'
+import { createGoogleAuthClient, refreshToken } from './google'
 
 export async function hasLunchBreakToday() {
   const events = await getTodaysEvents()
@@ -32,32 +32,18 @@ async function getTodaysEvents() {
 }
 
 async function authorize() {
-  // the token is generated outside of the server and then stored in kv.
-  // it is a long-lived refresh_token and can be exchanged to a short-lived
-  // access_token
-  const refreshToken = await kv.get<string>(process.env.KV_GTOKEN_KEY!)
-  if (!refreshToken) {
+  const token = await refreshToken()
+  if (!token) {
     throw new Error('refreshToken not stored')
   }
 
-  const oauth = new google.auth.OAuth2({
-    clientId: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  })
+  const oauth = createGoogleAuthClient()
 
   // instead of storing the access_token and refreshing it once it has expired,
   // let's just always grab a new access_token
-  oauth.setCredentials({ refresh_token: refreshToken })
+  oauth.setCredentials({ refresh_token: token })
   const tokens = await oauth.refreshAccessToken()
   oauth.setCredentials(tokens.credentials)
-
-  // apparently the refresh_token shouldn't come back here because
-  // it doesn't change, but it _does_ come back... so will it change?
-  // who knows. why not just store it if it's there, even if it's the same.
-  // won't hurt!
-  if (tokens.credentials.refresh_token) {
-    await kv.set(process.env.KV_GTOKEN_KEY!, tokens.credentials.refresh_token)
-  }
 
   return oauth
 }

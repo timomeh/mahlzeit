@@ -47,6 +47,10 @@ async function isLunchinTime() {
   const isLunchDay = SEND_AT_DAYS.includes(new Date().getDay())
   const isLunchTime = tzDate.getHours() === SEND_AT_HOUR
 
+  if (!isLunchDay || !isLunchTime) {
+    return false
+  }
+
   let hasLunchBreak = true
   try {
     hasLunchBreak = await gcal.hasLunchBreakToday()
@@ -55,5 +59,5 @@ async function isLunchinTime() {
     await sendMessage('🫨 Ohje! Ich konnte den Kalender nicht checken.')
   }
 
-  return isLunchDay && isLunchTime && hasLunchBreak
+  return hasLunchBreak
 }

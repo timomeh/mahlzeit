@@ -2,7 +2,7 @@ import { createGoogleAuthClient, storeRefreshToken } from '@/lib/google'
 
 export async function GET(request: Request) {
   if (process.env.NODE_ENV !== 'development') {
-    throw new Error('only locally')
+    return new Response('only allowed in dev env', { status: 403 })
   }
 
   const { searchParams } = new URL(request.url)

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 
 export async function GET(request: Request) {
   if (process.env.NODE_ENV !== 'development') {
-    throw new Error('only locally')
+    return new Response('only allowed in dev env', { status: 403 })
   }
 
   const oauth = createGoogleAuthClient({
